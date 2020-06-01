@@ -1,24 +1,18 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Menu from './components/Menu';
+import { Route } from 'react-router-dom';
+import RedPage from './pages/RedPage';
+import BluePage from './pages/BluePage';
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <input
-          type="text"
-          name="f"
-          placeholder="아무거나 입력"
-          onChange={(e) => console.log(e.target.value)}
-        />
-      </header>
+    <div>
+      <Menu />
+      <hr />
+      <Route path="/red" component={RedPage} />
+      <Route path="/blue" component={BluePage} />
     </div>
   );
-}
+};
 
 export default App;

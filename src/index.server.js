@@ -1,18 +1,18 @@
-import React from 'react';
-import ReactDOMServer from 'react-dom/server';
-import express from 'express';
-import { StaticRouter } from 'react-router-dom';
-import App from './App';
-import path from 'path';
-import fs from 'fs';
-import { createStore, applyMiddleware } from 'redux';
-import { Provider } from 'react-redux';
-import thunk from 'redux-thunk';
-import createSagaMiddleware from 'redux-saga';
-import { END } from 'redux-saga';
-import rootReducer, { rootSaga } from './modules';
-import PreloadContext from './lib/PreloadContext';
-import { ChunkExtractor, ChunkExtractorManager } from '@loadable/server';
+import React from "react";
+import ReactDOMServer from "react-dom/server";
+import express from "express";
+import { StaticRouter } from "react-router-dom";
+import App from "./App";
+import path from "path";
+import fs from "fs";
+import { createStore, applyMiddleware } from "redux";
+import { Provider } from "react-redux";
+import thunk from "redux-thunk";
+import createSagaMiddleware from "redux-saga";
+import { END } from "redux-saga";
+import rootReducer, { rootSaga } from "./modules";
+import PreloadContext from "./lib/PreloadContext";
+import { ChunkExtractor, ChunkExtractorManager } from "@loadable/server";
 
 // asset-manifest.json에서 파일 경로들을 조회합니다.
 // const manifest = JSON.parse(
@@ -24,7 +24,7 @@ import { ChunkExtractor, ChunkExtractorManager } from '@loadable/server';
 //   .map(key => `<script src="${manifest.files[key]}"></script>`) // 스크립트 태그로 변환하고
 //   .join(''); // 합침
 
-const statsFile = path.resolve('./build/loadable-stats.json');
+const statsFile = path.resolve("./build/loadable-stats.json");
 
 function createPage(root, tags) {
   return `<!DOCTYPE html>
@@ -61,12 +61,15 @@ const serverRender = async (req, res, next) => {
   const context = {};
   const sagaMiddleware = createSagaMiddleware();
 
-  const store = createStore(rootReducer, applyMiddleware(thunk, sagaMiddleware));
+  const store = createStore(
+    rootReducer,
+    applyMiddleware(thunk, sagaMiddleware)
+  );
   const sagaPromise = sagaMiddleware.run(rootSaga).toPromise();
 
   const preloadContext = {
     done: false,
-    promises: []
+    promises: [],
   };
 
   // 필요한 파일을 추출하기 위한 ChunkExtractor
@@ -98,20 +101,20 @@ const serverRender = async (req, res, next) => {
 
   // JSON 을 문자열로 변환하고 악성스크립트가 실행되는것을 방지하기 위해서 < 를 치환처리
   // https://redux.js.org/recipes/server-rendering#security-considerations
-  const stateString = JSON.stringify(store.getState()).replace(/</g, '\\u003c');
+  const stateString = JSON.stringify(store.getState()).replace(/</g, "\\u003c");
   const stateScript = `<script>__PRELOADED_STATE__ = ${stateString}</script>`; // 리덕스 초기 상태를 스크립트로 주입합니다.
 
   // 미리 불러와야 하는 스타일/스크립트를 추출하고
   const tags = {
-    scripts: stateScript + extractor.getScriptTags(), // 스크림트 앞부분에 리덕스 상태 넣기
+    scripts: stateScript + extractor.getScriptTags(), // 스크립트 앞부분에 리덕스 상태 넣기
     links: extractor.getLinkTags(),
-    styles: extractor.getStyleTags()
-  }
+    styles: extractor.getStyleTags(),
+  };
   res.send(createPage(root, tags)); // 클라이언트에게 결과물을 응답합니다.
 };
 
-const serve = express.static(path.resolve('./build'), {
-  index: false // "/" 경로에서 index.html 을 보여주지 않도록 설정
+const serve = express.static(path.resolve("./build"), {
+  index: false, // "/" 경로에서 index.html 을 보여주지 않도록 설정
 });
 
 app.use(serve); // 순서가 중요합니다. serverRender 전에 위치해야 합니다.
@@ -119,7 +122,7 @@ app.use(serverRender);
 
 // 5000포트로 서버를 가동합니다.
 app.listen(5000, () => {
-  console.log('Running on http://localhost:5000');
+  console.log("Running on http://localhost:5000");
 });
 
 // const html = ReactDOMServer.renderToString(
